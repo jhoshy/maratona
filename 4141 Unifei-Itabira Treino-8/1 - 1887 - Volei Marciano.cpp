@@ -1,14 +1,36 @@
 // http://br.spoj.com/problems/VOLEI/
 #include <iostream>
 
+using namespace std;
+
+bool **m, // matrix do input
+	***juiz;
+int N;
+
+bool qualquer(bool *piso) {
+	return piso[0] || piso[1] || piso[2] || piso[3];
+}
+
+bool verificar(int *xl, int *yl, int d) {
+	if (xl < 0 || yl < 0) return true;
+	if (!qualquer(m[*(yl)]/*[*(xl)]*/ )) return false;
+
+	if (*(yl) == 0 || !m[*(yl)-1][*(xl)] ) // passa linha por cima
+		if (!juiz[2][*(yl)][3] && !juiz[3][*(yl)][2] ) return false;
+	if (*(yl) == N-1 || !m[*(yl)+1][*(xl)] ) // baixo
+		if (!juiz[2][*(yl)+1][3] && !juiz[3][*(yl)+1][2] ) return false;
+	if (*(xl) == 0 || !m[*(yl)][*(xl)-1] ) // esquerda
+		if (!juiz[0][*(xl)][1] && !juiz[1][*(xl)][0] ) return false;
+	if (*(xl) == N-1 || !m[*(yl)][*(xl)+1] ) // direita
+		if (!juiz[0][*(xl)+1][1] && !juiz[1][*(xl)+1][0] ) return false;
+}
+								
 int main() {
 
 	while(1) {
-		int N;
 		cin >> N;
 		if (N == 0) return 0;
 
-		bool **m; // matrix do input
 		int largura = 0, altura = 0; // juizes
 
 		// matrix do input
@@ -34,7 +56,7 @@ int main() {
 			while(N--) {
 				m[N] = new bool[N];
 				int N3 = N2;
-				while(N3--) m[N][M] = false;
+				while(N3--) m[N][N3] = false;
 			}
 
 			N = N2;
@@ -52,7 +74,6 @@ int main() {
 
 
 		{
-			bool ***juiz;
 
 			// constroi a matrix de juizes
 			// [posicao][indice][direcao] , 
@@ -82,7 +103,7 @@ int main() {
 					x = -1;
 					while(++x < N) { // cada bloco na matrix pode gerar até 8 juízes
 						
-						if (y == 0 || !m[y-1][x]) { // cima
+						if (y == 0 || !m[y-1][x]) { // passa linha por cima
 							juiz[2][y][3] = true;
 							juiz[3][y][2] = true;
 						}
@@ -113,6 +134,12 @@ int main() {
 					int indice = cb ? largura : altura;
 					while(indice--) {
 						int direcao = 4;
+						bool juiz_old[4]; 
+						juiz_old[0] = juiz[posicao][indice][0];
+						juiz_old[1] = juiz[posicao][indice][1];
+						juiz_old[2] = juiz[posicao][indice][2];
+						juiz_old[3] = juiz[posicao][indice][3];
+
 						while(direcao--) {
 							// salva o estado atual
 							direcao_old[direcao] = juiz[posicao][indice][direcao];
@@ -126,29 +153,31 @@ int main() {
 							// verifica validez do estado, nesta direcao
 							int xl = indice, 
 								yl = indice,
-								*i = cb ? yl : xl;
+								*i = cb ? &yl : &xl,
+								*j = cb ? &xl : &yl;
+
 							*i = -1;
-							t = cb ? largura : altura;
+							int t = cb ? largura : altura;
 							while(++(*i) < t) {
-								// para cada ponto, no encontro de linhas, verificar as 4 casas ao redor.
-
-								// TODO verificaras 4 casas usando %
-								// TODO dai se alguma der errado, sair deste while, 
-								// TODO entao sair do outro, 
-								// TODO entao voltar ao estado anterior e verificar o proximo juiz
-
+								// para cada ponto, no encontro de linhas, verificar as 2 casas ao redor.
+								--(*j);
+								if (!verificar(i, j, direcao) || !verificar(i, j, direcao)) break;
 							}
+							if (*i != t ) break;
 						}
 
+						if (direcao != -1) {
+							// voltar ao o que era antes, este juíz nao pode ser removido.
+							juiz[posicao][indice][0] = juiz_old[0];
+							juiz[posicao][indice][1] = juiz_old[1];
+							juiz[posicao][indice][2] = juiz_old[2];
+							juiz[posicao][indice][3] = juiz_old[3];
+							break;
+						}
 					}
 				}
-
-
-
 			}
-
 		}
 	}
-
 	return 0;
 }
