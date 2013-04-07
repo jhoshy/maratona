@@ -104,15 +104,50 @@ int main() {
 
 			// simplifica juizes
 			{
+				// finge que retirou cada juiz, e ve se a matrix continua 'válida'.
+				int posicao = 4, indice, direcao;
+				int *direcao_old = new int[4];
+				bool cb; // juizes ficam em cima ou em baixo; senao, ficam na esquerda ou direita;
+				while(posicao--) {
+					cb = posicao < 2;
+					int indice = cb ? largura : altura;
+					while(indice--) {
+						int direcao = 4;
+						while(direcao--) {
+							// salva o estado atual
+							direcao_old[direcao] = juiz[posicao][indice][direcao];
+							
+							// verifica se juiz esta olhando pra esta direcao
+							if (juiz[posicao][indice][direcao] == 0) continue;
+
+							// deleta esse juiz, nesta direcao
+							juiz[posicao][indice][direcao] = 0;
+
+							// verifica validez do estado, nesta direcao
+							int xl = indice, 
+								yl = indice,
+								*i = cb ? yl : xl;
+							*i = -1;
+							t = cb ? largura : altura;
+							while(++(*i) < t) {
+								// para cada ponto, no encontro de linhas, verificar as 4 casas ao redor.
+
+								// TODO verificaras 4 casas usando %
+								// TODO dai se alguma der errado, sair deste while, 
+								// TODO entao sair do outro, 
+								// TODO entao voltar ao estado anterior e verificar o proximo juiz
+
+							}
+						}
+
+					}
+				}
+
 
 
 			}
 
 		}
-
-
-
-
 	}
 
 	return 0;
