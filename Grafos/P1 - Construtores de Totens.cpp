@@ -34,13 +34,12 @@ int main(int argc, char const *argv[])
 		cout << "Instancia " << ++k << "\n";
 
 		int j = i = -1;
-		while(++i < n) { // i é pra coluna
+		while(++i <= n-m) { // i é pra coluna
 			j = -1;
-			while(++j < n) { // j pra linha
+			while(++j <= n-m) { // j pra linha
 				int a = -1;
-				while(t[j * n + i + ++a / m + (a % m) * n] == s[a / m + (a % m) * m]);
+				while(++a != m * m && t[j * n + i + a / m + (a % m) * n] == s[a / m + (a % m) * m]);
 				if(a == m * m) cout << j << " " << i << "\n";
-					
 			}
 		}
 
